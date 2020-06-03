@@ -7,10 +7,10 @@ function validateUserId(req, res, next) {
     // do your magic!
     Users.getById(req.params.id)
         .then((user) => {
-            if (req.params.id) {
+            if (user.name) {
                 req.user = user;
                 next();
-            } else {
+            } else if (!user.name) {
                 (error) => {
                     console.log(error);
                     res.status(400).json({ message: "invalid user id" });
@@ -40,7 +40,10 @@ router.get("/", (req, res) => {
 
 router.get("/:id", validateUserId, (req, res) => {
     // do your magic!
-    res.status(200).json(req.user);
+    if (req.user !== "") {
+        res.status(200).json(req.user);
+    } else
+        res.status(404).json({ error: "That User Id is not in the data base" });
 });
 
 router.get("/:id/posts", validateUserId, (req, res) => {
