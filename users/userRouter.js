@@ -13,8 +13,7 @@ router.post("/:id/posts", (req, res) => {
 });
 
 router.get("/", validateUserId, (req, res) => {
-    // do your magic!
-    res.status(200).json({ Users });
+    res.status(200).json({ message: "get to /" });
 });
 
 router.get("/:id", (req, res) => {
@@ -53,28 +52,11 @@ function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-    // do your magic!
-    // Users.getById(req.params.id)
-    //     .then((user) => {
-    //         if (!user) {
-    //             res.status(404).json({
-    //                 message:
-    //                     "validateUser blocked this request as the user is not in the data base.",
-    //             });
-    //         } else {
-    //             req.user = user;
-    //             next();
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         res.status(500).json({
-    //             message: "Error getting the information you seek.",
-    //         });
-    //     });
+    //
 }
 
 function validatePost(req, res, next) {
-    // do your magic!
+    //
 }
 
 module.exports = router;
