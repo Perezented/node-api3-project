@@ -1,6 +1,19 @@
 const express = require("express");
 
 const router = express.Router();
+const Users = require("./userDb");
+
+function validateUserId(req, res, next) {
+    // do your magic!
+    Users.getById(req.params.id)
+        .then((user) => {
+            res.status(200).json(user);
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: "Error getting users" });
+        });
+}
 
 router.post("/", (req, res) => {
     // do your magic!
@@ -12,6 +25,9 @@ router.post("/:id/posts", (req, res) => {
 
 router.get("/", (req, res) => {
     // do your magic!
+    Users.get().then((Users) => {
+        res.status(200).json({ Users });
+    });
 });
 
 router.get("/:id", (req, res) => {
@@ -31,10 +47,6 @@ router.put("/:id", (req, res) => {
 });
 
 //custom middleware
-
-function validateUserId(req, res, next) {
-    // do your magic!
-}
 
 function validateUser(req, res, next) {
     // do your magic!
