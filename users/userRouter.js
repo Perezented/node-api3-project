@@ -7,11 +7,19 @@ function validateUserId(req, res, next) {
     // do your magic!
     Users.getById(req.params.id)
         .then((user) => {
-            res.status(200).json(user);
+            if (req.params.id) {
+                req.user = user;
+                res.status(200).json(user);
+            } else {
+                (error) => {
+                    console.log(error);
+                    res.status(400).json({ message: "invalid user id" });
+                };
+            }
         })
         .catch((error) => {
             console.log(error);
-            res.status(500).json({ message: "Error getting users" });
+            res.status(500).json({ message: "Error getting users", error });
         });
 }
 
