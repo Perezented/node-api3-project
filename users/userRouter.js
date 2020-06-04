@@ -18,6 +18,11 @@ function validateUser(req, res, next) {
 
 function validatePost(req, res, next) {
     // do your magic!
+    if (!req.body.text) {
+        res.status(400).json({ Error: "missing required text field" });
+    } else if (!req.body) {
+        res.status(400).json({ Error: "missing post data" });
+    } else next();
 }
 function validateUserId(req, res, next) {
     // do your magic!
@@ -42,19 +47,8 @@ function validateUserId(req, res, next) {
 router.post("/", (req, res) => {
     // do your magic!
     let postUser = req.body;
-    Users.insert(postUser)
-        .then(() => {
-            if (postUser.name) {
-                postUser.id = Date.now();
-                res.status(201).json(postUser);
-            } else
-                res.status(400).json({
-                    message: "No name was provided for the user.",
-                });
-        })
-        .catch((err) => {
-            res.status(400).json({ error: "Could not post information.", err });
-        });
+    postUser.id = Date.now();
+    res.status(201).json(postUser);
 });
 
 router.post("/:id/posts", (req, res) => {
