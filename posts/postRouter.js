@@ -7,14 +7,11 @@ const Posts = require("./postDb");
 function validatePostId(req, res, next) {
     // do your magic!
     Posts.getById(req.params.id).then((post) => {
-        if (post.text) {
+        if (req.post) {
+            res.status(400).json({ message: "invalid id" });
+        } else {
             req.post = post;
             next();
-        } else {
-            (error) => {
-                console.log(error);
-                res.status(400).json({ message: "invalid id" });
-            };
         }
     });
 }
@@ -35,7 +32,7 @@ router.get("/", (req, res) => {
 
 router.get("/:id", validatePostId, (req, res) => {
     // do your magic!
-    if (req.post !== "") {
+    if (req.post) {
         res.status(200).json(req.post);
     } else
         res.status(400).json({ error: "That post ID is not in the data base" });
@@ -43,16 +40,22 @@ router.get("/:id", validatePostId, (req, res) => {
 
 router.delete("/:id", validatePostId, (req, res) => {
     // do your magic!
-    Posts.remove(req.params.id).then(
-        res.status(204).json({ message: "Post was deleted." })
-    );
-    res.status(204).json({ message: "Post was deleted." });
+    if (req.post) {
+        Posts.remove(req.params.id).then(
+            res.status(204).json({ message: "Post was deleted." })
+        );
+        res.status(204).json({ message: "Post was deleted." });
+    } else res.status(404).json({ error: "Selected post is not found." });
 });
 
 router.put("/:id", validatePostId, (req, res) => {
     // do your magic!
-    req.body.id = req.post.id;
-    Posts.update(req.post.id, req.body).then(res.status(203).json(req.body));
+    if (req.post) {
+        req.body.id = req.post.id;
+        Posts.update(req.post.id, req.body).then(
+            res.status(203).json(req.body)
+        );
+    } else res.status(404).json({ error: "Selected post is not found." });
 });
 
 module.exports = router;

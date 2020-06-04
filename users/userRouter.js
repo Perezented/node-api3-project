@@ -41,7 +41,9 @@ function validateUserId(req, res, next) {
         })
         .catch((error) => {
             console.log(error);
-            res.status(500).json({ message: "Error getting users", error });
+            res.status(500).json({
+                message: "Error getting the specific user id",
+            });
         });
 }
 
@@ -55,12 +57,11 @@ router.post("/", validateUser, (req, res) => {
 });
 
 router.post("/:id/posts", validatePost, (req, res) => {
-    // do your magic!
+    // do your magic!//////////////////////////////////////////////////////////////
     let postPost = req.body;
     postPost.id = Date.now();
 
     Users.insert(postPost).then(res.status(201).json(postPost));
-    // res.status(201).json(postPost);
 });
 
 router.get("/", (req, res) => {
@@ -79,7 +80,7 @@ router.get("/", (req, res) => {
 
 router.get("/:id", validateUserId, (req, res) => {
     // do your magic!
-    if (req.user !== "") {
+    if (req.user) {
         res.status(200).json(req.user);
     } else
         res.status(404).json({ error: "That User Id is not in the data base" });
@@ -87,9 +88,11 @@ router.get("/:id", validateUserId, (req, res) => {
 
 router.get("/:id/posts", validateUserId, (req, res) => {
     // do your magic!
-    Users.getUserPosts(req.params.id).then((posts) => {
-        res.status(200).json(posts);
-    });
+    if (req.user) {
+        Users.getUserPosts(req.params.id).then((posts) => {
+            res.status(200).json(posts);
+        });
+    } else res.status(404).json({ error: "Specified user id is not found" });
 });
 
 router.delete("/:id", validateUserId, (req, res) => {
