@@ -60,8 +60,9 @@ router.post("/:id/posts", validatePost, (req, res) => {
     // do your magic!//////////////////////////////////////////////////////////////
     let postPost = req.body;
     postPost.id = Date.now();
-
-    Users.insert(postPost).then(res.status(201).json(postPost));
+    Posts.insert({ user_id: req.params.id, ...req.body }).then((item) => {
+        res.status(201).json({ item });
+    });
 });
 
 router.get("/", (req, res) => {
