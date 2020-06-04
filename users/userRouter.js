@@ -44,26 +44,36 @@ function validateUserId(req, res, next) {
         });
 }
 
-router.post("/", (req, res) => {
+router.post("/", validateUser, (req, res) => {
     // do your magic!
     let postUser = req.body;
     postUser.id = Date.now();
     res.status(201).json(postUser);
 });
 
-router.post("/:id/posts", (req, res) => {
+router.post("/:id/posts", validatePost, (req, res) => {
     // do your magic!
+    let postPost = req.body;
+    postPost.id = Date.now();
+
+    Users.insert(postPost).then((post) => {
+        res.status(201).json(post);
+    });
+    // res.status(201).json(postPost);
 });
 
 router.get("/", (req, res) => {
     // do your magic!
-    Users.get()
-        .then(res.status(200).json({ Users }))
-        .catch(
+    Users.get(req.query)
+        .then((users) => {
+            res.status(200).json(users);
+        })
+        .catch((err) => {
             res.status(500).json({
                 error: "",
-            })
-        );
+                err,
+            });
+        });
 });
 
 router.get("/:id", validateUserId, (req, res) => {
@@ -76,6 +86,9 @@ router.get("/:id", validateUserId, (req, res) => {
 
 router.get("/:id/posts", validateUserId, (req, res) => {
     // do your magic!
+    Users.getUserPosts(req.params.id).then((posts) => {
+        res.status(200).json(posts);
+    });
 });
 
 router.delete("/:id", (req, res) => {
