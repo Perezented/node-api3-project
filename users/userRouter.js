@@ -3,6 +3,22 @@ const express = require("express");
 const router = express.Router();
 const Users = require("./userDb");
 
+//custom middleware
+
+function validateUser(req, res, next) {
+    // do your magic!
+    if (!req.body) {
+        res.status(400).json({ Error: "missing user data." });
+    } else {
+        if (!req.body.name) {
+            res.status(400).json({ Error: "missing user name data." });
+        } else next();
+    }
+}
+
+function validatePost(req, res, next) {
+    // do your magic!
+}
 function validateUserId(req, res, next) {
     // do your magic!
     Users.getById(req.params.id)
@@ -25,6 +41,20 @@ function validateUserId(req, res, next) {
 
 router.post("/", (req, res) => {
     // do your magic!
+    let postUser = req.body;
+    Users.insert(postUser)
+        .then(() => {
+            if (postUser.name) {
+                postUser.id = Date.now();
+                res.status(201).json(postUser);
+            } else
+                res.status(400).json({
+                    message: "No name was provided for the user.",
+                });
+        })
+        .catch((err) => {
+            res.status(400).json({ error: "Could not post information.", err });
+        });
 });
 
 router.post("/:id/posts", (req, res) => {
@@ -33,9 +63,13 @@ router.post("/:id/posts", (req, res) => {
 
 router.get("/", (req, res) => {
     // do your magic!
-    Users.get().then((Users) => {
-        res.status(200).json({ Users });
-    });
+    Users.get()
+        .then(res.status(200).json({ Users }))
+        .catch(
+            res.status(500).json({
+                error: "",
+            })
+        );
 });
 
 router.get("/:id", validateUserId, (req, res) => {
@@ -57,15 +91,5 @@ router.delete("/:id", (req, res) => {
 router.put("/:id", (req, res) => {
     // do your magic!
 });
-
-//custom middleware
-
-function validateUser(req, res, next) {
-    // do your magic!
-}
-
-function validatePost(req, res, next) {
-    // do your magic!
-}
 
 module.exports = router;
