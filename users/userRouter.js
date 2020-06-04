@@ -48,7 +48,9 @@ router.post("/", validateUser, (req, res) => {
     // do your magic!
     let postUser = req.body;
     postUser.id = Date.now();
-    res.status(201).json(postUser);
+    Users.insert(postUser).then((user) => {
+        res.status(201).json(user);
+    });
 });
 
 router.post("/:id/posts", validatePost, (req, res) => {
@@ -91,12 +93,18 @@ router.get("/:id/posts", validateUserId, (req, res) => {
     });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateUserId, (req, res) => {
     // do your magic!
+    res.status(204).json({ message: "User was deleted." });
+    Users.remove(req.params.id).then((number) => {
+        res.status(204).json({ message: "User was deleted.", number });
+    });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateUserId, (req, res) => {
     // do your magic!
+    req.body.id = req.params.id;
+    Users.update(req.params.id, req.body).then(res.status(203).json(req.body));
 });
 
 module.exports = router;
