@@ -1,27 +1,58 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
-
-router.get('/', (req, res) => {
-  // do your magic!
-});
-
-router.get('/:id', (req, res) => {
-  // do your magic!
-});
-
-router.delete('/:id', (req, res) => {
-  // do your magic!
-});
-
-router.put('/:id', (req, res) => {
-  // do your magic!
-});
-
+const Posts = require("./postDb");
 // custom middleware
 
 function validatePostId(req, res, next) {
-  // do your magic!
+    // do your magic!
+    Posts.getById(req.params.id).then((post) => {
+        if (post.text) {
+            req.post = post;
+            next();
+        } else {
+            (error) => {
+                console.log(error);
+                res.status(400).json({ message: "invalid id" });
+            };
+        }
+    });
 }
+
+router.get("/", (req, res) => {
+    // do your magic!
+    Posts.get(req.query)
+        .then((posts) => {
+            res.status(200).json(posts);
+        })
+        .catch((err) => {
+            res.status(500).json({
+                error: "cannot get the data requested",
+                err,
+            });
+        });
+});
+
+router.get("/:id", validatePostId, (req, res) => {
+    // do your magic!
+    if (req.post !== "") {
+        res.status(200).json(req.post);
+    } else
+        res.status(400).json({ error: "That post ID is not in the data base" });
+});
+
+router.delete("/:id", validatePostId, (req, res) => {
+    // do your magic!
+    Posts.remove(req.params.id).then(
+        res.status(204).json({ message: "Post was deleted." })
+    );
+    res.status(204).json({ message: "Post was deleted." });
+});
+
+router.put("/:id", validatePostId, (req, res) => {
+    // do your magic!
+    req.body.id = req.post.id;
+    Posts.update(req.post.id, req.body).then(res.status(203).json(req.body));
+});
 
 module.exports = router;

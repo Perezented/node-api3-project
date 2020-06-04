@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const Users = require("./userDb");
+const Posts = require("../posts/postDb");
 
 //custom middleware
 
@@ -58,9 +59,7 @@ router.post("/:id/posts", validatePost, (req, res) => {
     let postPost = req.body;
     postPost.id = Date.now();
 
-    Users.insert(postPost).then((post) => {
-        res.status(201).json(post);
-    });
+    Users.insert(postPost).then(res.status(201).json(postPost));
     // res.status(201).json(postPost);
 });
 
@@ -72,7 +71,7 @@ router.get("/", (req, res) => {
         })
         .catch((err) => {
             res.status(500).json({
-                error: "",
+                error: "cannot get the data you requested",
                 err,
             });
         });
